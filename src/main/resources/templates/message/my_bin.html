@@ -45,7 +45,7 @@
     <td>휴지통이 비었습니다.</td>
  </tbody>
     <tbody th:if="${#lists.size(binList) > 0}">
-    <p>총 <strong><th:block th:text = "${count}"></th:block>건</strong></p>
+    <p>총 <strong><th:block th:text = "${countB}"></th:block>건</strong></p>
     <table border="1" style="border-collapse: collapse; width: 100%; border-color: #d1d1d1">
     <tr style="border-left: transparent; border-right: transparent; height: 40px; background-color: #ebebeb">
         <th width="5%" style="text-align: center;"><input type="checkbox" id = "allChecked"></th><th width="25%">발신자</th>
@@ -63,7 +63,7 @@
  </tbody>
         <ul class="pagination pagination-sm" th:if="${total_count}>0" style="justify-content : center;">
         <li th:classappend="${endPage < 6} ? 'page-item disabled' : 'page-item'">
-            <a class="page-link" th:href="@{/message/my_bin(pageNum=${startPage-5}, startPage${startPage-5})}"><<</a>
+            <a class="page-link" th:href="@{/message/my_bin(pageNum=${startPage-5}, startPage=${startPage-5})}"><<</a>
         </li>
             <li th:each="i:${#numbers.sequence(startPage, endPage)}" th:classappend="${pageNum == i} ? 'page-item active' : 'page-item'">
                 <a th:href="@{/message/my_bin(pageNum=${i})}" class="page-link">[[${i}]]</a></li>

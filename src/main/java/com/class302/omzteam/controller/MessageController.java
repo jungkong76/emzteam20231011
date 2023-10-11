@@ -213,7 +213,8 @@ public class MessageController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
         model.addAttribute("member", memberDao.selectOneMem(user.getUsername()));
-        model.addAttribute("count", messageDao.countMyBin(Integer.parseInt(user.getUsername())));
+        model.addAttribute("countB", messageDao.countMyBin(Integer.parseInt(user.getUsername())));
+        model.addAttribute("count", messageDao.countUnread(Integer.parseInt(user.getUsername())));
 
         int totalCount = messageDao.countMyBin(Integer.parseInt(user.getUsername()));
         int totalPage = totalCount / pageRow + (totalCount % pageRow >0 ? 1 :0);
