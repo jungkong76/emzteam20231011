@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+
+    <style>
+
+        select.box {
+            width: 20%;
+            height: 30px;
+            box-sizing: border-box;
+            margin-left: 5px;
+            padding: 5px 0 5px 10px;
+            border-radius: 4px;
+            border: 1px solid #d9d6d6;
+            color: #383838;
+            background-color: #ffffff;
+            font-family: 'Montserrat', 'Pretendard', sans-serif;
+        }
+
+        option {
+            font-size: 16px;
+        }
+
+        .info .box#domain-list option {
+            font-size: 14px;
+            background-color: #ffffff;
+        }
+
+    </style>
+
+</head>
+<body>
+
+
+
+<form action="/login/joinForm" method="post" th:object="${memberDto}" id="joinForm" class="loginForm">
+    <p>
+        <label>사용 가능한 사번<br/>
+            <input type="text" th:field="*{mem_no}" readonly="readonly" style="border: none;" />
+        </label>
+    </p>
+
+    <p>
+        <label>최초 비밀번호:<br/>
+            <input type="text" th:field="*{mem_pw}" readonly="readonly" style="border: none;" id="initialPassword" />
+        </label>
+    </p>
+
+    <p>
+        <label>이름:<br/>
+            <input type="text" th:field="*{mem_name}" />
+        </label>
+    </p>
+
+    <p>
+        <label for="job">직위 선택:</label>
+        <select th:field="*{job}" id="job">
+            <option value="" th:selected="${memberDto.job == null}">---직위 선택---</option>
+            <option th:value="1">대표</option>
+            <option th:value="2">이사</option>
+            <option th:value="3">부장</option>
+            <option th:value="4">과장</option>
+            <option th:value="5">대리</option>
+            <option th:value="6">사원</option>
+        </select>
+    </p>
+
+    <p>
+        <label>생일:</label>
+        <input type="text" name="birth" id="birthdate" th:field="*{birth}" autocomplete="off" />
+        <button id="calendar-button" type="button">달력</button>
+    </p>
+
+    <p>
+        <label>이메일:</label>
+        <input type="hidden" name="full_email" id="full-email" th:field="*{email}" />
+        <input class="box" id="domain" type="text" />@
+        <input class="box" id="domain-txt" type="text" />
+        <select class="box" id="domain-list">
+            <option value="type">직접 입력</option>
+            <option value="naver.com">naver.com</option>
+            <option value="google.com">google.com</option>
+            <option value="hanmail.net">hanmail.net</option>
+            <option value="nate.com">nate.com</option>
+            <option value="kakao.com">kakao.com</option>
+        </select>
+    </p>
+
+
+    <p>
+        <label>핸드폰 번호:</label>
+            <input type="text" name="phone" id="phone" th:field="*{phone}" />
+    </p>
+
+
+
+    <p>
+        <label for="dept_no">부서 선택:</label>
+        <select th:field="*{dept_no}" id="dept_no">
+            <option value="" th:selected="${memberDto.job == null}">---부서 선택---</option>
+            <option th:value="1">인사팀</option>
+            <option th:value="2">홍보팀</option>
+            <option th:value="3">구매부</option>
+            <option th:value="10">물류창고</option>
+            <option th:value="11">부산영업부</option>
+            <option th:value="12">대구영업부</option>
+            <option th:value="13">경기도 영업부</option>
+        </select>
+    </p>
+
+
+    <input type="submit" value="등록" id="buttonS">
+</form>
+
+
+<script>
+
+    // 달력
+    $(document).ready(function () {
+        // 한국어 로케일 설정
+        $.datepicker.setDefaults($.datepicker.regional['ko']);
+
+        var $birthdate = $("#birthdate");
+        var datePickerOptions = {
+            dateFormat: "yy/mm/dd",
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "1900:+0",
+            showButtonPanel: true,
+            closeText: "닫기",
+            currentText: "오늘",
+            onSelect: function (dateText) {
+                // 날짜가 선택될 때 입력 필드에 값을 설정
+                $birthdate.val(dateText);
+            }
+        };
+        // 달력 초기화
+        $birthdate.datepicker(datePickerOptions);
+
+        // 달력 버튼 클릭 시 달력 표시/숨김 토글
+        $("#calendar-button").click(function () {
+            if ($birthdate.datepicker("widget").is(":hidden")) {
+                // 필요하다면 여기서 오늘 날짜 설정
+                // $birthdate.datepicker("setDate", new Date());
+                $birthdate.datepicker("show");
+            } else {
+                $birthdate.datepicker("hide");
+            }
+        });
+    });
+
+
+    // email input, select
+    const domainListEl = document.querySelector('#domain-list')
+    const domainInputEl = document.querySelector('#domain-txt')
+
+    domainListEl.addEventListener('change', (event) => {
+
+        if(event.target.value !== "type") {
+            // 선택한 도메인을 input에 입력하고 disabled
+            domainInputEl.value = event.target.value
+            domainInputEl.disabled = true
+        } else { // 직접 입력 시
+            // input 내용 초기화 & 입력 가능하도록 변경
+            domainInputEl.value = ""
+            domainInputEl.disabled = false
+        }
+    })
+
+    $(document).ready(function () {
+
+
+       // 이메일 결합
+        $("#joinForm").submit(function(event) {
+            // 두 개의 이메일 입력값을 결합
+            var email = $("#domain").val() + "@" + $("#domain-txt").val();
+
+
+            $("#full-email").val(email);
+        });
+
+
+    });
+
+
+    $(document).ready(function() {
+        // 핸드폰 번호 입력 필드와 비밀번호 입력 필드의 ID 설정
+        var phoneField = document.getElementById("phone");
+
+
+        // 핸드폰 번호 입력 필드의 'input' 이벤트 핸들러 등록
+        phoneField.addEventListener("input", function() {
+            var phoneNumber = phoneField.value;
+
+            // 입력 값을 숫자만 남기고 나머지는 제거
+            var cleanedPhoneNumber = phoneNumber.replace(/\D/g, "");
+
+            // 특정 패턴에 맞게 번호를 다시 포맷
+            if (cleanedPhoneNumber.length >= 3 && cleanedPhoneNumber.length <= 6) {
+                cleanedPhoneNumber = cleanedPhoneNumber.substring(0, 3) + "-" + cleanedPhoneNumber.substring(3);
+            }
+            else if (cleanedPhoneNumber.length >= 7) {
+                cleanedPhoneNumber = cleanedPhoneNumber.substring(0, 3) + "-" + cleanedPhoneNumber.substring(3, 7) + "-" + cleanedPhoneNumber.substring(7);
+            }
+
+            phoneField.value = cleanedPhoneNumber;
+
+
+
+        });
+    });
+
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("initialPassword").value = "1234";
+    });
+
+
+</script>
+
+</script>
+
+</body>
+</html>

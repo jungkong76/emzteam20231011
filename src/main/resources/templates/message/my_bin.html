@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>메시지함</title>
+    <style>
+        #main {
+            margin: 60px auto;
+        }
+        ul {list-style:none;}
+        li {
+            float: left;
+            margin-top: 20px;
+        }
+        .forms{
+            float: right;
+            margin-right: 20px;
+        }
+        #revive{
+            background-color: #e74a3b;
+            border-color: transparent;
+            color: white;
+        }
+        #delete{
+            background-color: #f6c23e;
+            border-color: transparent;
+            color: white;
+        }
+        #deleteAll{
+            background-color: #4e73df;
+            border-color: transparent;
+            color: white;
+        }
+        .smaller{
+            font-size: 13px;
+        }
+    </style>
+</head>
+<th:block th:replace="~{/layout/basicM :: setContent(~{this::content})}">
+    <span th:fragment="content">
+<body>
+<div id ="main">
+<h3 style="margin-bottom: 20px;">휴지통</h3>
+ <tbody th:if="${#lists.size(binList) == 0}">
+    <td>휴지통이 비었습니다.</td>
+ </tbody>
+    <tbody th:if="${#lists.size(binList) > 0}">
+    <p>총 <strong><th:block th:text = "${count}"></th:block>건</strong></p>
+    <table border="1" style="border-collapse: collapse; width: 100%; border-color: #d1d1d1">
+    <tr style="border-left: transparent; border-right: transparent; height: 40px; background-color: #ebebeb">
+        <th width="5%" style="text-align: center;"><input type="checkbox" id = "allChecked"></th><th width="25%">발신자</th>
+        <th width="25%">수신자</th><th width="25%">제목</th><th width="20%">발신일자</th></tr>
+    <tr th:each="msg: ${binList}" style="border-left: transparent; border-right: transparent; height: 38px;">
+        <td style="text-align: center;"><input type="checkbox" th:value = "${msg.mno}" class = "checked"></td>
+        <td th:if="${member.mem_name != msg.sender_name || member.dept != msg.sender_dept}" th:utext="|<strong>${msg.sender_name}</strong> (${msg.sender_dept})|"></td>
+        <td th:if="${member.mem_name == msg.sender_name && member.dept == msg.sender_dept}" th:text="나"></td>
+
+        <td th:if="${member.mem_name != msg.listener_name || member.dept != msg.listener_dept}" th:utext="|<strong>${msg.listener_name}</strong> (${msg.listener_dept})|"></td>
+        <td th:if="${member.mem_name == msg.listener_name && member.dept == msg.listener_dept}" th:text="나"></td>
+        <td><a th:href="@{/message/view(mno=${msg.mno})}" style="color: black">[[${msg.mTitle}]]</a></td>
+        <td th:text="${msg.date_sent}" class="smaller"></td></tr>
+    </table>
+ </tbody>
+        <ul class="pagination pagination-sm" th:if="${total_count}>0" style="justify-content : center;">
+        <li th:classappend="${endPage < 6} ? 'page-item disabled' : 'page-item'">
+            <a class="page-link" th:href="@{/message/my_bin(pageNum=${startPage-5}, startPage${startPage-5})}"><<</a>
+        </li>
+            <li th:each="i:${#numbers.sequence(startPage, endPage)}" th:classappend="${pageNum == i} ? 'page-item active' : 'page-item'">
+                <a th:href="@{/message/my_bin(pageNum=${i})}" class="page-link">[[${i}]]</a></li>
+        <li th:classappend="${endPage == total_page} ? 'page-item disabled' : 'page-item'">
+            <a class="page-link" th:href="@{/message/my_bin(pageNum=${endPage+1}, startPage=${endPage+1})}">>></a>
+        </li>
+        </ul>
+</div>
+<div id="keys">
+    <tbody th:if="${#lists.size(binList) > 0}">
+    <form action="/message/revive" method="post" class="forms">
+        <input type="hidden" name = "mno" id = "mnoR" value="">
+        <input type = "submit" id="revive" value="복원" class="btn btn-primary"/>
+    </form>
+    <form action="/message/deleteForever" method="post" class="forms">
+        <input type="hidden" name = "mno" id = "mnoD" value="">
+        <input type = "submit" id="delete" value="삭제" class="btn btn-primary"/>
+    </form>
+    <form action="/message/deleteAllForever" method="post" class="forms">
+        <input type = "submit" id="deleteAll" value="비우기" class="btn btn-primary"/>
+    </form>
+    </tbody>
+</div>
+</body>
+        <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+           let checkboxes = document.querySelectorAll(".checked");
+           let mno;
+        document.getElementById("allChecked").addEventListener("change", function(event) {
+        	if (this.checked) {
+        	for(let i = 0; i < checkboxes.length; i++){
+        	        checkboxes[i].checked = true;
+        	        }
+        	    } else if (!this.checked){
+        	    for(let i = 0; i < checkboxes.length; i++){
+        	    	checkboxes[i].checked = false;
+        	    	}
+        	    }
+             });
+
+            document.getElementById("revive").addEventListener("click", function (event) {
+            mno = [];
+            for(let i = 0; i < checkboxes.length; i++){
+                if(checkboxes[i].checked){
+                mno.push(checkboxes[i].value);
+                }
+            }
+
+            if(mno.length == 0){
+            event.preventDefault();
+            alert("복원하실 메시지를 선택하세요.");
+            } else {
+
+            document.getElementById("mnoR").value = mno;
+            let conf = confirm("선택하신 메시지를 복원합니다.");
+            if(conf != true){
+                event.preventDefault();
+                }
+              }
+		    });
+
+		    document.getElementById("delete").addEventListener("click", function (event) {
+		    mno = [];
+		    for(let i = 0; i < checkboxes.length; i++){
+                if(checkboxes[i].checked){
+                mno.push(checkboxes[i].value);
+                }
+            }
+
+            if(mno.length == 0){
+            event.preventDefault();
+            alert("삭제하실 메시지를 선택하세요.");
+            } else {
+
+            document.getElementById("mnoD").value = mno;
+            let conf = confirm("선택하신 메시지를 삭제합니다.\n삭제 후에는 복구가 불가능합니다.");
+            if(conf != true){
+                event.preventDefault();
+                }
+              }
+		    });
+
+		    document.getElementById("deleteAll").addEventListener("click", function (event) {
+            let conf = confirm("휴지통의 모든 메시지를 삭제합니다.\n삭제 후에는 복구가 불가능합니다.");
+            if(conf != true){
+                event.preventDefault();
+                }
+		    });
+          });
+        </script>
+    </th:block>
+</th:block>
+</html>

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<th:block th:replace="~{/layout/basic :: setContent(~{this::content})}">
+
+    <th:block th:fragment="content">
+<body>
+
+[[${list}]]
+</body>
+    </th:block>
+
+</th:block>
+</html>

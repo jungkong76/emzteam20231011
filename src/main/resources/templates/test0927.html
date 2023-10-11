@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id='calendar'></div>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth', // 달력 초기 뷰 설정
+            events: [
+                {
+                    title: '출근',
+                    start: '2023-09-26T08:22:35',
+                    color: 'blue'
+                },
+                {
+                    title: '퇴근',
+                    start: '2023-09-26T08:22:35',
+                    color: 'green'
+                },
+                {
+                    title: '고객사미팅하나둘삼넷다섯여섯',
+                    start: '2023-09-26T11:22:35',
+                    end: '2023-09-29T15:00:35',
+                },
+                {
+                    title: '고객사미팅하나',
+                    start: '2023-09-26T11:22:35',
+                    end: '2023-09-26T15:00:35',
+                },
+            ]
+        });
+
+        calendar.render();
+    });
+</script>
+</body>
+</html>
